@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Pregunta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/generar.css') }}">
+</head>
+<body>
+    <h1>ESTA ES LA PAGINA DE IA GENERAR PREGUNTA</h1>
+
+    <label for="texto">Ingrese un texto:</label>
+    <textarea id="texto" rows="4" cols="50"></textarea>
+
+    <button id="enviarTexto">Generar Preguntas</button>
+    <h2>Preguntas Generadas:</h2>
+    <ul id="preguntasLista"></ul>
+
+    <button id="backHome">BACK</button>
+
+    <script>
+        document.getElementById('backHome').addEventListener('click', () => {
+            fetch("{{ url_for('index') }}")
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = response.url;
+                } else {
+                    console.error("Error al cargar la pagina.");
+                }
+            })
+            .catch(error => console.error("Error en la solicitud: ", error));
+        });
+
+        document.getElementById('enviarTexto').addEventListener('click', () => {
+            const texto = document.getElementById('texto').value;
+
+            if (!texto) {
+                alert("Por favor, ingrese un texto.");
+                return;
+            }
+
+            fetch("{{ url_for('generate_question') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ texto })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const listaPreguntas = document.getElementById('preguntasLista');
+                listaPreguntas.innerHTML = "";
+                if (data.preguntas) {
+                    data.preguntas.forEach(pregunta => {
+                        const li = document.createElement("li");
+                        li.textContent = pregunta;
+                        listaPreguntas.appendChild(li);
+                    });
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error en la solicitud:", error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>GPT IA 5 - Panel de Herramientas</title>
+</head>
+
+<body>
+    <header>
+        <h1>GPT IA 5 - Panel de Herramientas</h1>
+        <p class="subtitle">Selecciona la función que necesitas</p>
+    </header>
+
+    <main class="dashboard">
+        <div class="card" id="traductorButton">
+            <div class="card-icon">
+                <i class="fas fa-language"></i>
+            </div>
+            <div class="card-content">
+                <h3>Traductor</h3>
+                <p>Traduce texto entre múltiples idiomas con precisión y contexto adecuado.</p>
+            </div>
+            <div class="card-hover">
+                <span>Usar herramienta</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <div class="card" id="resumenButton">
+            <div class="card-icon">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="card-content">
+                <h3>Resumen</h3>
+                <p>Genera resúmenes concisos de documentos largos manteniendo los puntos clave.</p>
+            </div>
+            <div class="card-hover">
+                <span>Usar herramienta</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <div class="card" id="preguntaButton">
+            <div class="card-icon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="card-content">
+                <h3>Resolver Preguntas</h3>
+                <p>Obtén respuestas precisas a tus preguntas basadas en conocimiento actualizado.</p>
+            </div>
+            <div class="card-hover">
+                <span>Usar herramienta</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <div class="card" id="generar_preguntaButton">
+            <div class="card-icon">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="card-content">
+                <h3>Generar Preguntas</h3>
+                <p>Crea preguntas relevantes sobre cualquier tema para evaluar comprensión.</p>
+            </div>
+            <div class="card-hover">
+                <span>Usar herramienta</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+    </main>
+
+    
+
+    <script>
+        // Configuración de eventos para todas las tarjetas
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                const endpoint = {
+                    'traductorButton': "{{ url_for('generar_traduccion') }}",
+                    'resumenButton': "{{ url_for('generar_resumen') }}",
+                    'preguntaButton': "{{ url_for('resolver_pregunta') }}",
+                    'generar_preguntaButton': "{{ url_for('generate_question') }}"
+                }[this.id];
+                
+                fetch(endpoint)
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = response.url;
+                        } else {
+                            console.error("Error al cargar la página.");
+                        }
+                    })
+                    .catch(error => console.error("Error en la solicitud: ", error));
+            });
+        });
+    </script>
+</body>
+
+</html>

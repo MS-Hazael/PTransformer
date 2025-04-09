@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resumen.css') }}">
+</head>
+
+<body>
+    <h1>ESTA ES LA PAGINA DE IA RESUMEN</h1>
+
+    <textarea id="texto" rows="5" cols="50" placeholder="Introduce el texto aquí..."></textarea>
+    <br>
+    <button id="resumir">Generar Resumen</button>
+    <p><strong>Texto Resumido:</strong></p>
+    <p id="resultado"></p>
+
+    <button id="backHome">BACK</button>
+
+    <script>
+        document.getElementById('backHome').addEventListener('click', () => {
+            fetch("{{ url_for('index') }}")
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = response.url;
+                } else {
+                    console.error("Error al cargar la pagina.");
+                }
+            })
+            .catch(error => console.error("Error en la solicitud: ", error));
+        });
+
+        document.getElementById("resumir").addEventListener("click", () => {
+            let texto = document.getElementById("texto").value;
+
+            fetch("/resumen", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ texto: texto })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.resumen) {
+                    document.getElementById("resultado").innerText = data.resumen;
+                } else {
+                    document.getElementById("resultado").innerText = "Error al generar resumen.";
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pregunta.css') }}">
+</head>
+<body>
+    <h1>ESTA ES LA PAGINA DE IA RESOLVER PREGUNTA BASADO EN CONTEXTO</h1>
+
+    <label for="contexto">Ingrese el contexto:</label>
+    <textarea id="contexto" rows="4" cols="50"></textarea>
+
+    <label for="pregunta">Ingrese su pregunta:</label>
+    <input type="text" id="pregunta">
+
+    <button id="enviarPregunta">Enviar</button>
+    <p><strong>Respuesta:</strong> <span id="respuesta"></span></p>
+
+    <button id="backHome">BACK</button>
+
+    <script>
+        document.getElementById('backHome').addEventListener('click', () => {
+            fetch("{{ url_for('index') }}")
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = response.url;
+                } else {
+                    console.error("Error al cargar la pagina.");
+                }
+            })
+            .catch(error => console.error("Error en la solicitud: ", error));
+        });
+
+        document.getElementById('enviarPregunta').addEventListener('click', () => {
+            const contexto = document.getElementById('contexto').value;
+            const pregunta = document.getElementById('pregunta').value;
+
+            if (!contexto || !pregunta) {
+                alert("Por favor, ingrese un contexto y una pregunta.");
+                return;
+            }
+
+            fetch("{{ url_for('resolver_pregunta') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contexto, pregunta })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.respuesta) {
+                    document.getElementById('respuesta').innerText = data.respuesta;
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error en la solicitud:", error));
+        });
+    </script>
+</body>
+</html>

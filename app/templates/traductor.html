@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traductor Automático</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/traductor.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Traductor Automático</h1>
+        <p class="subtitle">Escribe tu texto y lo traduciremos automáticamente</p>
+        
+        <div class="translator-box">
+            <label for="texto">Texto a traducir:</label>
+            <textarea id="texto" rows="6" placeholder="Escribe aquí el texto que deseas traducir..."></textarea>
+            
+            <div class="actions">
+                <button id="traducirBtn">
+                    <i class="fas fa-language"></i> Traducir
+                </button>
+                <button id="backHome">
+                    <i class="fas fa-home"></i> Volver al inicio
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <h2>Traducción:</h2>
+                <div id="resultado"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script>
+        document.getElementById('backHome').addEventListener('click', () => {
+            fetch("{{ url_for('index') }}")
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = response.url;
+                    } else {
+                        console.error("Error al cargar la página.");
+                    }
+                })
+                .catch(error => console.error("Error en la solicitud: ", error));
+        });
+
+        document.getElementById('traducirBtn').addEventListener('click', () => {
+            const texto = document.getElementById('texto').value.trim();
+            
+            if (!texto) {
+                alert("Por favor, introduce un texto para traducir.");
+                return;
+            }
+
+            // Mostrar estado de carga
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Traduciendo...</div>';
+            
+            // Enviar texto para traducción automática
+            fetch("{{ url_for('generar_traduccion') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ texto })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultado.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i> Error: ${data.error}</div>`;
+                } else {
+                    resultado.innerHTML = `
+                        <div class="translation-result">
+                            <div class="translated-text">${data.traduccion}</div>
+                            <div class="language-info">
+                                <span class="detected-language">Idioma detectado: ${data.idioma_origen}</span>
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="target-language">Traducido al: ${data.idioma_destino}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error("Error en la traducción:", error);
+                resultado.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i> Error al conectar con el servidor</div>`;
+            });
+        });
+    </script>
+</body>
+
+</html>
